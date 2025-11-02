@@ -88,34 +88,67 @@ class SimpleCrawler {
 
       try {
         console.log(`Crawling: ${url}`);
+        
+        // Enhanced headers to avoid being blocked
+        const headers = {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.5',
+          'Accept-Encoding': 'gzip, deflate',
+          'Connection': 'keep-alive',
+          'Upgrade-Insecure-Requests': '1',
+          'Cache-Control': 'max-age=0'
+        };
+
         const response = await axios.get(url, {
           timeout: this.options.timeout,
           maxRedirects: this.options.followRedirects ? 5 : 0,
-          headers: {'User-Agent': 'Crawler-Pro/1.0'},
-          validateStatus: (status) => status < 500
-        });
-
-        const $ = cheerio.load(response.data);
-        const title = $('title').text().trim() || 'No title';
-        const links = [];
-        
-        $('a[href]').each((i, elem) => {
-          const href = $(elem).attr('href');
-          if (href && href.startsWith('http')) {
-            links.push(href);
+          headers: headers,
+          validateStatus: (status) => status < 500,
+          // Add retry logic for transient failures
+          'axios-retry': {
+            retries: 3,
+            retryDelay: (retryCount) => retryCount * 1000,
+            retryCondition: (error) => {
+              return axios.isRetryableError(error) || (error.response?.status >= 500);
+            }
           }
         });
 
-        this.results.push({
-          url,
-          title,
-          links: links.slice(0, 5),
-          status: response.status,
-          depth
+        const $ = cheerio.load(response.data);
+        const title = $('title').text().trim() || $('h1').first().text().trim() || 'No title';
+        const links = [];
+        
+        // More comprehensive link extraction
+        $('a[href]').each((i, elem) => {
+          const href = $(elem).attr('href');
+          if (href) {
+            try {
+              // Handle relative URLs
+              const absoluteUrl = new URL(href, url).href;
+              if (absoluteUrl.startsWith('http')) {
+                links.push(absoluteUrl);
+              }
+            } catch (e) {
+              // Invalid URL, skip it
+            }
+          }
         });
 
-        // Add new links to queue
-        for (const link of links.slice(0, 3)) {
+        // Remove duplicates
+        const uniqueLinks = [...new Set(links)];
+
+        this.results.push({
+          url,
+          title: title || 'Untitled',
+          links: uniqueLinks.slice(0, 5),
+          status: response.status,
+          depth,
+          timestamp: new Date().toISOString()
+        });
+
+        // Add new links to queue (limit to prevent explosion)
+        for (const link of uniqueLinks.slice(0, 2)) {
           if (!this.visited.has(link) && this.results.length < this.maxPages) {
             this.queue.push({url: link, depth: depth + 1});
           }
@@ -126,12 +159,26 @@ class SimpleCrawler {
         
       } catch (error) {
         console.error(`Error crawling ${url}:`, error.message);
+        
+        // More detailed error information
+        let errorDetails = error.message;
+        if (error.response) {
+          errorDetails = `HTTP ${error.response.status}: ${error.response.statusText}`;
+        } else if (error.code === 'ECONNREFUSED') {
+          errorDetails = 'Connection refused - server may be down';
+        } else if (error.code === 'ETIMEDOUT') {
+          errorDetails = 'Request timed out - server may be slow';
+        } else if (error.code === 'ENOTFOUND') {
+          errorDetails = 'Domain not found - check the URL';
+        }
+
         this.results.push({
           url,
-          title: 'Error',
-          error: error.message,
-          status: 0,
-          depth
+          title: 'Error - ' + errorDetails,
+          error: errorDetails,
+          status: error.response?.status || 0,
+          depth,
+          timestamp: new Date().toISOString()
         });
       }
     }
