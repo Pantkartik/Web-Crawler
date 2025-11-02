@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crawler Pro - Advanced Web Intelligence</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+        }
+
+        .progress-container {
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .results-container {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .result-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .result-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .result-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        .result-url {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+            word-break: break-all;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .result-url:hover {
+            text-decoration: underline;
+        }
+
+        .result-meta {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-error {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .status-pending {
+            background: #bee3f8;
+            color: #2a4365;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #a0aec0;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #4a5568;
+        }
+
+        .advanced-options {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .toggle-advanced {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 0;
+        }
+
+        .toggle-advanced:hover {
+            text-decoration: underline;
+        }
+
+        .advanced-content {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .advanced-content.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-spider"></i> Crawler Pro</h1>
+            <p>Advanced Web Intelligence & Data Extraction Platform</p>
+        </div>
+
+        <div class="main-grid">
+            <div class="card">
+                <h2><i class="fas fa-cog"></i> Configuration</h2>
+                
+                <div class="form-group">
+                    <label for="url">Target URL</label>
+                    <input type="url" id="url" class="form-control" placeholder="https://example.com" value="https://example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="maxPages">Maximum Pages</label>
+                    <input type="range" id="maxPages" class="form-control" min="1" max="50" value="10">
+                    <div style="text-align: center; margin-top: 5px; font-weight: 500; color: #667eea;">
+                        <span id="maxPagesValue">10</span> pages
+                    </div>
+                </div>
+
+                <div class="advanced-options">
+                    <button class="toggle-advanced" onclick="toggleAdvanced()">
+                        <i class="fas fa-chevron-down" id="advancedIcon"></i>
+                        Advanced Options
+                    </button>
+                    
+                    <div class="advanced-content" id="advancedContent">
+                        <div class="form-group">
+                            <label for="delay">Delay between requests (ms)</label>
+                            <input type="number" id="delay" class="form-control" value="1000" min="100" max="5000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="timeout">Request timeout (ms)</label>
+                            <input type="number" id="timeout" class="form-control" value="10000" min="5000" max="30000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="followRedirects" checked> Follow redirects
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="respectRobots"> Respect robots.txt
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="startCrawl()" style="width: 100%; margin-top: 20px;">
+                    <i class="fas fa-play"></i> Start Crawling
+                </button>
+
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Initializing...</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-chart-line"></i> Results Dashboard</h2>
+                
+                <div class="stats-grid" id="statsGrid" style="display: none;">
+                    <div class="stat-card">
+                        <span class="stat-number" id="totalPages">0</span>
+                        <span class="stat-label">Pages Found</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="successCount">0</span>
+                        <span class="stat-label">Successful</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="errorCount">0</span>
+                        <span class="stat-label">Errors</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="avgDepth">0</span>
+                        <span class="stat-label">Avg Depth</span>
+                    </div>
+                </div>
+
+                <div class="results-container" id="resultsContainer">
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h3>Ready to Crawl</h3>
+                        <p>Enter a URL and click "Start Crawling" to begin</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isCrawling = false;
+        let crawlResults = [];
+
+        // Initialize max pages slider
+        document.getElementById('maxPages').addEventListener('input', function() {
+            document.getElementById('maxPagesValue').textContent = this.value;
+        });
+
+        function toggleAdvanced() {
+            const content = document.getElementById('advancedContent');
+            const icon = document.getElementById('advancedIcon');
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('show');
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        async function startCrawl() {
+            if (isCrawling) return;
+
+            const url = document.getElementById('url').value;
+            const maxPages = parseInt(document.getElementById('maxPages').value);
+            const delay = parseInt(document.getElementById('delay').value);
+            const timeout = parseInt(document.getElementById('timeout').value);
+            const followRedirects = document.getElementById('followRedirects').checked;
+            const respectRobots = document.getElementById('respectRobots').checked;
+
+            if (!url) {
+                showNotification('Please enter a valid URL', 'error');
+                return;
+            }
+
+            isCrawling = true;
+            crawlResults = [];
+            
+            // Update UI
+            const crawlButton = document.querySelector('.btn-primary');
+            crawlButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Crawling...';
+            crawlButton.disabled = true;
+            
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('statsGrid').style.display = 'grid';
+            document.getElementById('resultsContainer').innerHTML = '<div class="empty-state"><div class="loading-spinner"></div><h3>Crawling in Progress</h3><p>Please wait while we explore the web...</p></div>';
+
+            try {
+                const response = await fetch('/crawl', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        url,
+                        maxPages,
+                        delay,
+                        timeout,
+                        followRedirects,
+                        respectRobots
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    crawlResults = data.results;
+                    updateStats();
+                    displayResults();
+                    showNotification(`Crawl completed! Found ${data.total} pages`, 'success');
+                } else {
+                    showNotification(`Error: ${data.error}`, 'error');
+                    document.getElementById('resultsContainer').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>Crawl Failed</h3><p>' + data.error + '</p></div>';
+                }
+            } catch (error) {
+                showNotification(`Network error: ${error.message}`, 'error');
+                document.getElementById('resultsContainer').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>Network Error</h3><p>' + error.message + '</p></div>';
+            } finally {
+                isCrawling = false;
+                crawlButton.innerHTML = '<i class="fas fa-play"></i> Start Crawling';
+                crawlButton.disabled = false;
+                document.getElementById('progressContainer').style.display = 'none';
+            }
+        }
+
+        function updateStats() {
+            const total = crawlResults.length;
+            const successful = crawlResults.filter(r => r.status >= 200 && r.status < 300).length;
+            const errors = crawlResults.filter(r => r.status >= 400 || r.error).length;
+            const avgDepth = total > 0 ? (crawlResults.reduce((sum, r) => sum + (r.depth || 0), 0) / total).toFixed(1) : 0;
+
+            document.getElementById('totalPages').textContent = total;
+            document.getElementById('successCount').textContent = successful;
+            document.getElementById('errorCount').textContent = errors;
+            document.getElementById('avgDepth').textContent = avgDepth;
+        }
+
+        function displayResults() {
+            const container = document.getElementById('resultsContainer');
+            
+            if (crawlResults.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><h3>No Results</h3><p>No pages were found during the crawl</p></div>';
+                return;
+            }
+
+            const resultsHTML = crawlResults.map((result, index) => {
+                const statusClass = result.status >= 200 && result.status < 300 ? 'status-success' : 
+                                  result.status >= 400 || result.error ? 'status-error' : 'status-pending';
+                
+                const statusText = result.error ? 'Error' : 
+                                 result.status >= 200 && result.status < 300 ? 'Success' : 'Other';
+
+                return `
+                    <div class="result-item fade-in" style="animation-delay: ${index * 0.1}s">
+                        <div class="result-header">
+                            <div>
+                                <div class="result-title">${result.title || 'Untitled Page'}</div>
+                                <a href="${result.url}" target="_blank" class="result-url">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    ${result.url}
+                                </a>
+                            </div>
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </div>
+                        
+                        <div class="result-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-sitemap"></i>
+                                Depth: ${result.depth || 0}
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-link"></i>
+                                ${result.links ? result.links.length : 0} links
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-clock"></i>
+                                ${result.status || 'Unknown'}
+                            </div>
+                        </div>
+                        
+                        ${result.error ? `<div class="status-error" style="margin-top: 10px; padding: 10px; border-radius: 6px;"><i class="fas fa-exclamation-circle"></i> ${result.error}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = resultsHTML;
+        }
+
+        function showNotification(message, type) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                transform: translateX(400px);
+                transition: transform 0.3s ease;
+                max-width: 300px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            `;
+
+            if (type === 'success') {
+                notification.style.background = 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)';
+            } else if (type === 'error') {
+                notification.style.background = 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)';
+            } else {
+                notification.style.background = 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)';
+            }
+
+            notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : 'exclamation-triangle'}"></i> ${message}`;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Remove after 4 seconds
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 4000);
+        }
+
+        // Simulate progress updates
+        function simulateProgress() {
+            if (!isCrawling) return;
+            
+            const progress = Math.random() * 80 + 10; // Random progress between 10-90%
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `Crawling... ${Math.round(progress)}%`;
+            
+            if (isCrawling) {
+                setTimeout(simulateProgress, 2000);
+            }
+        }
+
+        // Add some example URLs for quick testing
+        const exampleUrls = [
+            'https://example.com',
+            'https://httpbin.org',
+            'https://jsonplaceholder.typicode.com',
+            'https://www.w3.org',
+            'https://developer.mozilla.org'
+        ];
+
+        // Add autocomplete functionality
+        document.getElementById('url').addEventListener('focus', function() {
+            const value = this.value;
+            if (value && exampleUrls.some(url => url.includes(value))) {
+                // Could implement dropdown here
+            }
+        });
+    </script>
+</body>
+</html>
